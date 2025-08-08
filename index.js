@@ -27,6 +27,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
+
+
+// ✅ CORS Setup for Vercel
+app.use(cors({
+  origin: [
+    'http://localhost:5173', 
+    'https://loin-logic-nags-9wbb.vercel.app'
+  ],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 // -------------------- CAREER ROUTE --------------------
 app.post("/send-career", upload.single("resume"), (req, res) => {
   const { name, email, phone } = req.body;
@@ -70,15 +82,17 @@ app.post("/send-email", (req, res) => {
 
   const mailOptions = {
     from: email,
-    to: "nn1528523@gmail.com",
-    subject: "New Contact Form Submission",
+    to: "nn1528523@gmail.com", // your receiving email
+    subject: `New Contact Form: ${subject}`,
     text: `
       Name: ${fullname}
       Email: ${email}
-      Subject: ${subject}
       Phone: ${phone}
-      Message: ${description}
-    `,
+      Subject: ${subject}
+
+      Message:
+      ${description}
+    `
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -86,11 +100,15 @@ app.post("/send-email", (req, res) => {
       console.error("Contact form error:", error);
       return res.status(500).json({ message: "Failed to send message", error: error.message });
     } else {
-      console.log("Contact form email sent: " + info.response);
+      console.log("Contact email sent: " + info.response);
       return res.status(200).json({ message: "Message sent successfully", info: info.response });
     }
   });
 });
+
+
+
+
 
 // -------------------- FEEDBACK ROUTE --------------------
 app.post("/send-feedback", (req, res) => {
